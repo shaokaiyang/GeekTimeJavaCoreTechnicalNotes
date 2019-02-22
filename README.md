@@ -53,10 +53,38 @@
 
 # 正文
 <h2 id="0">开篇词，以面试题为切入点有效提升Java内功</h2>
+* Java初级、中级工程师要求：扎实的Java和计算机科学基础，掌握主流开发框架的使用。  
+* Java高级工程师考察Java IO/NIO,Java虚拟机，底层源代码，分布式、安全和性能领域。  
+* 涉及内容：Java基础，Java进阶，Java应用开发扩展，Java安全基础，Java性能基础
 <h2 id="1">第1讲 谈谈你对Java平台的理解</h2>
+问题：谈谈你对Java平台的理解？“Java是解释执行”这句话正确吗？  
+* Java是面向对象的语言，显著特点：（1）write once run anywhere；（2）垃圾回收，内存的分配和回收；  
+* JRE是Java运行环境，包括JVM和Java类库及一些模块；JDK是JRE的一个超集，提供了更多的工具如编译器、各种诊断工具；  
+* Java源代码首先通过javac编译成为字节码，然后通过JVM内嵌的解释器讲字节码转化为机器码。但是我们使用的Oracle JDK提供的Hotspot JVM提供了JIT编译器（动态编译器），可以在运行时将热点代码编译成机器码，这时候就是编译执行。  
+* Java源代码经过javac编译成“.class”类型的字节码，在运行时JVM通过类加载器（Clacc-Loader）加载字节码，解释或者编译执行。-Xint参数表示只进行解释执行；-Xcomp参数表示关闭解释执行；-Xmixed参数表示混合模式；  
+* 其他新的编译方式：AOT：直接将字节码编译成机器代码，Java9中就实验性的引入AOT特性。 
+* Java语言的基本特性：面向对象，反射，泛型、Java类库：集合，网络，安全、Java虚拟机：垃圾收集器，运行时，动态编译，辅助功能、Java工具：jlink,jar,javac,sjavac,jmap,jstack、Java生态:spring,hadoop,spark,elasticsearch,maven.  
 <h2 id="2">第2讲 Exception和Error有什么区别？</h2>
+问题：对比exception和error，运行时异常与一般异常有什么区别？
+* exception和error都继承了throwable类，Java中只有throwable类型的实例才可以被抛出或者捕获；  
+* exception和error是Java平台设计者对不同异常情况的分类处理。exception是程序正常运行中，可以预料的意外情况，应该被捕获并处理；error是不大可能出现的情况会导致程序处于非正常的不可恢复的状态；  
+* exception可分为可检查异常和不可检查异常，可检查异常在源代码中必须显式进行捕获处理，不检查异常就是运行是异常。  
+* 常见error：LinkageError，NoClassDefFoundError,ExceptionInInitializerError,VirtualMachineError,OutOfMemoryError,StackOverflowError;常见exception：IOException,RuntimeException,ClassNotFoundException;  
+* ClassNotFoundException当动态加载class的时候找不到类会抛出，一般在执行class.forName(),classLoader.loadClass()时候抛出；NoClassDefFoundError当编译成功以后执行过程中class找不到导致抛出该错误由JVM的运行时系统抛出。  
+* 异常处理的基本语法：try-cache-finally,throw,throws  
+* 异常处理注意：1尽量不要捕获类似于exception这样的通用异常，应该捕获特定异常；2不要生吞异常，不要假设这段代码可能不会发生。  
+* try-cache代码段会产生额外的性能开销，要仅对有必要的代码段进行捕获，不用异常进行代码流程控制；Java每实例化一个exception都会对当时的栈进行快照，这是一个比较重的操作。  
 <h2 id="3">第3讲 谈谈final、finally、finalize有什么不同？</h2>
+* final可以用来修饰类、方法和变量，final修饰的类不可以继承扩展，修饰的变量不可以修改，修饰的方法不可以重写。  
+* finally是Java保证重点代码一定要被执行的一种机制，可以使用try-finally来进行类似关闭JDBC连接、保证unlock锁等动作。  
+* finalize是基础类java.lang.Object的一个方法，目的是保证对象在被垃圾收集前完成特定资源的回收。  
+* final可以防止API被更改保证平台安全，可以避免意外赋值导致的编程错误，保护只读数据，减少额外开销。  
+* final只能约束strList这个引用不可以被赋值，但是strList对象的行为不被final影响。List.of（）创建的本身就是不可变的List.  
+* 实现一个immutable类需要做到：class自身声明为final，成员变量定义为private和final且不实现set方法，构造对象时成员变量使用深度拷贝来进行初始化，实现get方法时使用copy-on-write原则建立私有copy。  
+* finally中的代码不被执行的情况：1 try-cache异常退出，system.exit(1)，2 无限循环，3 线程被杀死；  
 <h2 id="4">第4讲 强引用、软引用、弱引用、幻象引用有什么区别？</h2>
+不同的引用类型主要体现在对象不同的可达性状态和对垃圾收集的影响。  
+* 强引用：
 <h2 id="5">第5讲 String、StringBuffer、StringBuilder有什么区别？</h2>
 <h2 id="6">第6讲 动态代理是基于什么原理？</h2>
 <h2 id="7">第7讲 int和Integer有什么区别？</h2>
