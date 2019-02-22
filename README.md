@@ -55,7 +55,8 @@
 <h2 id="0">开篇词，以面试题为切入点有效提升Java内功</h2>
 * Java初级、中级工程师要求：扎实的Java和计算机科学基础，掌握主流开发框架的使用。  
 * Java高级工程师考察Java IO/NIO,Java虚拟机，底层源代码，分布式、安全和性能领域。  
-* 涉及内容：Java基础，Java进阶，Java应用开发扩展，Java安全基础，Java性能基础
+* 涉及内容：Java基础，Java进阶，Java应用开发扩展，Java安全基础，Java性能基础  
+
 <h2 id="1">第1讲 谈谈你对Java平台的理解</h2>
 问题：谈谈你对Java平台的理解？“Java是解释执行”这句话正确吗？  
 * Java是面向对象的语言，显著特点：（1）write once run anywhere；（2）垃圾回收，内存的分配和回收；  
@@ -64,6 +65,7 @@
 * Java源代码经过javac编译成“.class”类型的字节码，在运行时JVM通过类加载器（Clacc-Loader）加载字节码，解释或者编译执行。-Xint参数表示只进行解释执行；-Xcomp参数表示关闭解释执行；-Xmixed参数表示混合模式；  
 * 其他新的编译方式：AOT：直接将字节码编译成机器代码，Java9中就实验性的引入AOT特性。 
 * Java语言的基本特性：面向对象，反射，泛型、Java类库：集合，网络，安全、Java虚拟机：垃圾收集器，运行时，动态编译，辅助功能、Java工具：jlink,jar,javac,sjavac,jmap,jstack、Java生态:spring,hadoop,spark,elasticsearch,maven.  
+
 <h2 id="2">第2讲 Exception和Error有什么区别？</h2>
 问题：对比exception和error，运行时异常与一般异常有什么区别？
 * exception和error都继承了throwable类，Java中只有throwable类型的实例才可以被抛出或者捕获；  
@@ -74,6 +76,7 @@
 * 异常处理的基本语法：try-cache-finally,throw,throws  
 * 异常处理注意：1尽量不要捕获类似于exception这样的通用异常，应该捕获特定异常；2不要生吞异常，不要假设这段代码可能不会发生。  
 * try-cache代码段会产生额外的性能开销，要仅对有必要的代码段进行捕获，不用异常进行代码流程控制；Java每实例化一个exception都会对当时的栈进行快照，这是一个比较重的操作。  
+
 <h2 id="3">第3讲 谈谈final、finally、finalize有什么不同？</h2>
 * final可以用来修饰类、方法和变量，final修饰的类不可以继承扩展，修饰的变量不可以修改，修饰的方法不可以重写。  
 * finally是Java保证重点代码一定要被执行的一种机制，可以使用try-finally来进行类似关闭JDBC连接、保证unlock锁等动作。  
@@ -82,11 +85,25 @@
 * final只能约束strList这个引用不可以被赋值，但是strList对象的行为不被final影响。List.of（）创建的本身就是不可变的List.  
 * 实现一个immutable类需要做到：class自身声明为final，成员变量定义为private和final且不实现set方法，构造对象时成员变量使用深度拷贝来进行初始化，实现get方法时使用copy-on-write原则建立私有copy。  
 * finally中的代码不被执行的情况：1 try-cache异常退出，system.exit(1)，2 无限循环，3 线程被杀死；  
+
 <h2 id="4">第4讲 强引用、软引用、弱引用、幻象引用有什么区别？</h2>
 不同的引用类型主要体现在对象不同的可达性状态和对垃圾收集的影响。  
-* 强引用：
+* 强引用：（直接调用，不回收）最常见的普通对象引用，只要还有强引用指向一个对象就能表明对象还“活着”，垃圾收集器不会进行收集。对于一个普通的对象，如果没有其他引用关系，只要超过了引用的作用域或者显式地将强引用赋值为null，就可以被收集。  
+* 软引用：（通过get（）方法，视内存情况回收）可以豁免一些垃圾收集，只有当JVM认为内存不足时才会去试图回收软引用指向的对象。软引用通常用来实现内存敏感的缓存，保证使用缓存的同时不会耗尽内存。  
+* 弱引用：（通过get（）方法，永远回收）不能豁免垃圾收集，仅仅提供一种访问在弱引用状态下对象的途径。例如维护一种非强制性的映射关系，如果试图获取时对象还在，就使用它，否则重新实例化，是很多缓存实现的选择。  
+* 幻想引用（虚引用）：（无法取得，不回收）不能通过他访问对象。提供了一种确保对象被finalize以后做某些事情的机制。Java平台自身的cleaner机制，利用幻想引用监控对象的创建和销毁。  
+* 除了幻想引用，如果对象还没有被销毁，可以通过get方法获取原有对象，利用软引用和弱引用可以改变对象的可达性状态，如果错误的保持了强引用，对象就不能变回类似弱引用的可达性状态了，就会产生内存泄露。  
+
 <h2 id="5">第5讲 String、StringBuffer、StringBuilder有什么区别？</h2>
+* string是Java语言非常基础和重要的类，是immutable类，其不可变性导致类似拼接、剪裁字符串等动作都会产生新的string对象。  
+* stringbuffer可以使用append或者add方法把字符串添加到已有序列的末尾或者指定位置，是一个线程安全的可修改字符串序列。  
+* stringbuilder去掉了线程安全，有效减小了开销。  
+* 字符串设计和实现考量：stringbuffer中通过添加synchronized关键字实现线程安全。构建时初始字符串长度加16，底层采用char（JDK9之后是byte）数组。  
+* 字符串缓存：intern是一种显式地排重机制。  
+* string自身的演化：Java9之前string采用char数组存储，Java9中通过一个byte数组加上一个标识编码来存储。  
+
 <h2 id="6">第6讲 动态代理是基于什么原理？</h2>
+
 <h2 id="7">第7讲 int和Integer有什么区别？</h2>
 <h2 id="8">第8讲 对比Vector、ArrayList、LinkedList有何区别？</h2>
 <h2 id="9">第9讲 对比Hashtable、HashMap、TreeMap有什么不同？</h2>
